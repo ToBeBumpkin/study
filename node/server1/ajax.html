@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <button id="sendGetBtn">get请求</button>
+    <button id="sendPostBtn">post请求</button>
+    <button id="abortPostBtn">取消post请求</button>
+    <div id="console"></div>
+
+    <script>
+        const consoleInfo = document.getElementById('console')
+
+
+        document.getElementById('sendPostBtn').addEventListener('click', function () {
+            myPostAjax()
+        })
+
+        let xhr = null;
+        let isSending = false
+
+        function myPostAjax() {
+            if(isSending) xhr.abort()
+            xhr = new XMLHttpRequest()
+            xhr.open('POST', 'http://localhost:8001/delay?t=' + Date.now())
+            // xhr.setRequestHeader('MYKEY','1234566')
+            xhr.timeout = 2000
+            xhr.ontimeout = function () {
+                alert('网络错误')
+            }
+            xhr.responseType = 'json'
+            xhr.send('a=1&b=2&c=3')
+            isSending = true
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        console.log(xhr.status);
+                        console.log(xhr);
+                        consoleInfo.innerHTML = xhr.response
+                        isSending = false
+                    }
+                }
+            }
+        }
+
+        document.getElementById('abortPostBtn').addEventListener('click', function () {
+            xhr.abort()
+        })
+
+        cosnt xhr = new XMLHttpRequest()
+        xhr.open('get','url?a=1')
+        xhr.send({
+            a:1,
+            b:2
+        })
+        xhr.onreadystatechange = function(){
+            if(xhr.readyState === 4){
+                if(xhr.status >= 200 && xhr.status<300){
+                    console.log(xhr.response);
+                }
+            }
+        }
+
+        document.getElementById('sendGetBtn').addEventListener('click', function () {
+            myGetAjax()
+        })
+        function myGetAjax() {
+            const xhr = new XMLHttpRequest()
+            xhr.open('GET', 'http://localhost:8001/server1?a=1&b=2&c=3')
+            xhr.send()
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        console.log(xhr.status);
+                        console.log(xhr);
+                        consoleInfo.innerHTML = xhr.response
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
